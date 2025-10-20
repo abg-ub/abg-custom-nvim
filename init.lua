@@ -165,9 +165,14 @@ vim.opt.softtabstop = 2 -- Number of spaces inserted for a <Tab>
 vim.opt.smartindent = true -- Smart autoindenting
 vim.opt.shellslash = true -- Changes the vim \ to /
 vim.opt.shadafile = 'NONE'
-vim.keymap.set('i', 'jj', '<Esc>', { noremap = true, silent = true })
+-- In insert mode: exit and save
+vim.keymap.set('i', 'jj', '<Esc>:update<CR>', { noremap = true, silent = true })
+-- In terminal mode: exit to normal mode
+vim.keymap.set('t', 'jj', [[<C-\><C-n>]], { noremap = true, silent = true })
+
 vim.api.nvim_set_keymap('i', '<C-H>', '<C-w>', { noremap = true, silent = true }) -- Ctrl+Backspace: delete next word, stay in insert mode
 vim.api.nvim_set_keymap('i', '<C-Del>', '<C-o>dw', { noremap = true, silent = true }) -- Ctrl+Delete: delete next word, stay in insert mode
+vim.api.nvim_set_keymap('t', '<C-H>', '<C-w>', { noremap = true, silent = true }) -- Ctrl+Backspace: delete next word, stay in terminal mode
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
 
@@ -1009,12 +1014,12 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
