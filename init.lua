@@ -93,7 +93,7 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
--- [[ Setting options ]]
+-- [[ SETTING OPTIONS ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
@@ -152,6 +152,22 @@ vim.o.splitbelow = true
 vim.o.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
+-- custom config
+vim.opt.number = true -- show absolute line numbers
+vim.opt.relativenumber = true -- show relative numbers
+vim.opt.signcolumn = 'yes' -- always show sign column
+vim.opt.numberwidth = 4 -- fix width of number column (adjust 4→5 if you have huge files)
+vim.fn.system('rm -f ' .. vim.fn.stdpath 'data' .. '/swap/*')
+vim.opt.tabstop = 2 -- Number of spaces a <Tab> counts for
+vim.opt.shiftwidth = 2 -- Size of an indent
+vim.opt.expandtab = true -- Use spaces instead of tabs
+vim.opt.softtabstop = 2 -- Number of spaces inserted for a <Tab>
+vim.opt.smartindent = true -- Smart autoindenting
+vim.opt.shellslash = true -- Changes the vim \ to /
+vim.opt.shadafile = 'NONE'
+vim.keymap.set('i', 'jj', '<Esc>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('i', '<C-H>', '<C-w>', { noremap = true, silent = true }) -- Ctrl+Backspace: delete next word, stay in insert mode
+vim.api.nvim_set_keymap('i', '<C-Del>', '<C-o>dw', { noremap = true, silent = true }) -- Ctrl+Delete: delete next word, stay in insert mode
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
 
@@ -172,7 +188,7 @@ vim.o.confirm = true
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
+vim.o.timeoutlen = 500 -- 300ms window for jj (adjust as you like)
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -196,13 +212,13 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  See `:help wincmd` for a list of all window commands
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set('n', '<C-j>', '<C-w><C->', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
--- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
+-- vim.keymap.set("n", "<C-S->", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
 -- [[ Basic Autocommands ]]
@@ -358,6 +374,13 @@ require('lazy').setup({
   --
   -- Use the `dependencies` key to specify the dependencies of a particular plugin
 
+  {
+    'nvim-telescope/telescope-frecency.nvim',
+    dependencies = { 'tami5/sqlite.lua' },
+    config = function()
+      require('telescope').load_extension 'frecency'
+    end,
+  },
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
@@ -407,12 +430,26 @@ require('lazy').setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        -- pickers = {}
+        defaults = {
+          file_ignore_patterns = {
+
+            'node_modules',
+            '%.git/',
+            '%.next/',
+            'dist/',
+            'build/',
+            'venv/',
+            '__pycache__/',
+            'coverage/',
+          },
+          path_display = { 'smart' },
+        }, -- pickers = {}
+
+        pickers = {
+          find_files = {
+            find_command = { 'fd', '--type', 'f', '--strip-cwd-prefix' },
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -776,7 +813,6 @@ require('lazy').setup({
       },
     },
   },
-
   { -- Autocompletion
     'saghen/blink.cmp',
     event = 'VimEnter',
